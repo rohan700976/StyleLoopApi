@@ -27,15 +27,18 @@ db.connect((err) => {
 // Make DB globally accessible (optional & simple)
 app.set('db', db);
 
+
 // Import and use the menshirt routes
 const menshirtRoutes = require('./routes/menShirt');
 const womenshirtRoutes=require('./routes/womenShirt');
 const menstshirtRoute=require('./routes/menTshirt')
 const mensjeansRouter=require('./routes/mensJeans')
+const filterRouter=require('./routes/filter')
 app.use('/womenshirt',womenshirtRoutes);
 app.use('/menshirt', menshirtRoutes);
 app.use('/menstshirt', menstshirtRoute);
 app.use('/mensjeans',mensjeansRouter);
+app.use('/filter',filterRouter);
 
 
 // Start server
