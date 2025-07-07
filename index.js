@@ -34,11 +34,13 @@ const womenshirtRoutes=require('./routes/womenShirt');
 const menstshirtRoute=require('./routes/menTshirt')
 const mensjeansRouter=require('./routes/mensJeans')
 const filterRouter=require('./routes/filter')
+const kidsRouter=require('./routes/kids')
 app.use('/womenshirt',womenshirtRoutes);
 app.use('/menshirt', menshirtRoutes);
 app.use('/menstshirt', menstshirtRoute);
-app.use('/mensjeans',mensjeansRouter);
-app.use('/filter',filterRouter);
+app.use('/mensjeans',mensjeansRouter); 
+ app.use('/filter',filterRouter);
+ app.use('/kids', kidsRouter);
 
 
 // Start server
