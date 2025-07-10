@@ -30,15 +30,17 @@ app.set('db', db);
 
 // Import and use the menshirt routes
 const menshirtRoutes = require('./routes/menShirt');
-const womenshirtRoutes=require('./routes/womenShirt');
+const womensRoutes=require('./routes/womenData');
 const menstshirtRoute=require('./routes/menTshirt')
 const mensjeansRouter=require('./routes/mensJeans')
 const filterRouter=require('./routes/filter')
-app.use('/womenshirt',womenshirtRoutes);
+const kidsRouter=require('./routes/kids')
+app.use('/women',womensRoutes);
 app.use('/menshirt', menshirtRoutes);
 app.use('/menstshirt', menstshirtRoute);
-app.use('/mensjeans',mensjeansRouter);
-app.use('/filter',filterRouter);
+app.use('/mensjeans',mensjeansRouter); 
+ app.use('/filter',filterRouter);
+ app.use('/kids', kidsRouter);
 
 
 // Start server
