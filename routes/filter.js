@@ -34,7 +34,7 @@ router.get('/:tablename/price/:price1/:price2/', (req, res) => {
 router.get('/:tablename/fabric/:fabric',(req,res)=>{
     const fabric=req.params.fabric;
    const db= req.app.get('db')
-   db.query(`select * from ${req.params.tablename} where 	Fabric=?,[fabric]`,(err,result)=>{
+   db.query(`select * from ${req.params.tablename} where 	Fabric=?`,[fabric],(err,result)=>{
      
     if (err) {
       return res.status(500).send(err); // Use return to prevent double send
@@ -45,15 +45,20 @@ router.get('/:tablename/fabric/:fabric',(req,res)=>{
 })
 
 router.get('/:tablename/rating/:rating',(req,res)=>{
-    const rating=req.params.rating;
-    const updateRating=Math.round(rating)
    const db= req.app.get('db')
-   db.query(`select * from ${req.params.tablename} where Rating=?`,[updateRating],(err,result)=>{
-     
+
+    const rating = parseFloat(req.params.rating);
+const lowerBound = rating - 0.01;
+const upperBound = rating + 0.01;
+
+db.query(
+  `SELECT * FROM ${req.params.tablename} WHERE Rating BETWEEN ? AND ?`,
+  [lowerBound, upperBound],
+  (err, results) => {
     if (err) {
       return res.status(500).send(err); // Use return to prevent double send
     }
-    res.send(result);
+    res.send(results);
   });
 })
 
