@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const PORT = 8000;
 
+app.use(express.json());
 
 app.use(cors());
 
@@ -35,12 +36,16 @@ const menstshirtRoute=require('./routes/menTshirt')
 const mensjeansRouter=require('./routes/mensJeans')
 const filterRouter=require('./routes/filter')
 const kidsRouter=require('./routes/kids')
+const usersRouter=require('./routes/users')
+const wishlistRouter=require('./routes/wishlist')
 app.use('/women',womensRoutes);
 app.use('/menshirt', menshirtRoutes);
 app.use('/menstshirt', menstshirtRoute);
 app.use('/mensjeans',mensjeansRouter); 
  app.use('/filter',filterRouter);
  app.use('/kids', kidsRouter);
+ app.use('/api',usersRouter)
+ app.use('/wishlist',wishlistRouter)
 
 
 // Start server
