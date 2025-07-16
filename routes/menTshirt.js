@@ -7,7 +7,7 @@ router.get('/tshirt',(req,res)=>{
   const db = req.app.get('db');
   db.query('select * from menstshirt',(err,result)=>{
     if(err){
-         console.log(error);
+         console.log(err);
          res.status(500).json({ query:"failed"});
     }
     res.send(result)
