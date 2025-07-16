@@ -31,6 +31,7 @@ app.set('db', db);
 
 // Import and use the menshirt routes
 const menshirtRoutes = require('./routes/menShirt');
+// const menTshirtRoutes=require('./routes/menTshirt')
 const womensRoutes=require('./routes/womenData');
 const menstshirtRoute=require('./routes/menTshirt')
 const mensjeansRouter=require('./routes/mensJeans')
