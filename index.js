@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const app = express();
+require('dotenv').config();
 const cors = require('cors');
 const PORT = 8000;
 
@@ -10,10 +11,11 @@ app.use(cors());
 
 // MySQL connection config
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'StyleLoop'
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  database: process.env.DATABASE,
+
 });
 
 // Connect to DB
