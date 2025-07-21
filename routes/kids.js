@@ -1,91 +1,124 @@
 const express = require('express');
 const router = express.Router();
+const redis = require('../client');
 
-// Get all users (men shirts)
-router.get('/:tablename', (req, res) => {
-  const db = req.app.get('db');
+// Get all data from table
+router.get('/:tablename', async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const tablename = req.params.tablename;
 
-  db.query(`SELECT * FROM ${req.params.tablename}`, (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Query failed' });
+    const cached = await redis.get(tablename);
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached)); // ✅ FIXED
     }
-    res.json(results);
-  });
+
+    db.query(`SELECT * FROM ${tablename}`, async (err, results) => {
+      if (err) return res.status(500).json({ error: 'Query failed' });
+
+      await redis.set(tablename, JSON.stringify(results)); // ✅ FIXED
+      res.json(results);
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "server error", details: error.message }); // ✅ FIXED
+  }
 });
 
-// Get user by ID
-router.get('/:tablename/:id', (req, res) => {
-  const db = req.app.get('db'); // ✅ Access db again
-  const id = req.params.id;
+// Get by ID
+router.get('/:tablename/:id', async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const { tablename, id } = req.params;
+    const cacheKey = `${tablename}:${id}`;
 
-  db.query(`SELECT * FROM ${req.params.tablename} WHERE Product_id = ?`, [id], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Query failed' });
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached));
     }
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    db.query(`SELECT * FROM ${tablename} WHERE Product_id = ?`, [id], async (err, results) => {
+      if (err) return res.status(500).json({ error: 'Query failed' });
+      if (results.length === 0) return res.status(404).json({ message: 'Product not found' });
 
-    res.json(results);
-  });
+      await redis.set(cacheKey, JSON.stringify(results));
+      res.json(results);
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "server error", details: error.message });
+  }
 });
 
-router.get('/:tablename/fabric/:fabric', (req, res) => {
-  const db = req.app.get('db'); // ✅ Access db again
-  const fabric = req.params.fabric;
+// Get by Fabric
+router.get('/:tablename/fabric/:fabric', async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const { tablename, fabric } = req.params;
+    const cacheKey = `${tablename}:fabric:${fabric}`;
 
-  db.query(`SELECT * FROM ${req.params.tablename} WHERE Fabric= ?`, [fabric], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Query failed' });
-    }
+    const cached = await redis.get(cacheKey);
+    if (cached) return res.status(200).json(JSON.parse(cached));
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    db.query(`SELECT * FROM ${tablename} WHERE Fabric = ?`, [fabric], async (err, results) => {
+      if (err) return res.status(500).json({ error: 'Query failed' });
+      if (results.length === 0) return res.status(404).json({ message: 'Product not found' });
 
-    res.json(results);
-  });
+      await redis.set(cacheKey, JSON.stringify(results));
+      res.json(results);
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "server error", details: error.message });
+  }
 });
 
-router.get('/:tablename/occasion/:occasion',(req,res)=>{
-    const db=req.app.get('db')
-    const occasion=req.params.occasion;
-   db.query(`SELECT * FROM ${req.params.tablename} WHERE Occasion= ?`, [occasion], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Query failed' });
-    }
+// Get by Occasion
+router.get('/:tablename/occasion/:occasion', async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const { tablename, occasion } = req.params;
+    const cacheKey = `${tablename}:occasion:${occasion}`;
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    const cached = await redis.get(cacheKey);
+    if (cached) return res.status(200).json(JSON.parse(cached));
 
-    res.json(results);
-  });
+    db.query(`SELECT * FROM ${tablename} WHERE Occasion = ?`, [occasion], async (err, results) => {
+      if (err) return res.status(500).json({ error: 'Query failed' });
+      if (results.length === 0) return res.status(404).json({ message: 'Product not found' });
+
+      await redis.set(cacheKey, JSON.stringify(results));
+      res.json(results);
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "server error", details: error.message });
+  }
 });
 
-router.get('/:tablename/rating/:rating',(req,res)=>{
-  const db=req.app.get('db')
-   const rating = parseFloat(req.params.rating);
-const lowerBound = rating - 0.01;
-const upperBound = rating + 0.01;
+// Get by Rating (±0.01)
+router.get('/:tablename/rating/:rating', async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const { tablename, rating } = req.params;
+    const parsedRating = parseFloat(rating);
+    const lower = parsedRating - 0.01;
+    const upper = parsedRating + 0.01;
+    const cacheKey = `${tablename}:rating:${rating}`;
 
-db.query(
-  `SELECT * FROM ${req.params.tablename} WHERE Rating BETWEEN ? AND ?`,
-  [lowerBound, upperBound],
-  (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Query failed' });
-    }
+    const cached = await redis.get(cacheKey);
+    if (cached) return res.status(200).json(JSON.parse(cached));
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    db.query(
+      `SELECT * FROM ${tablename} WHERE Rating BETWEEN ? AND ?`,
+      [lower, upper],
+      async (err, results) => {
+        if (err) return res.status(500).json({ error: 'Query failed' });
+        if (results.length === 0) return res.status(404).json({ message: 'Product not found' });
 
-    res.json(results);
+        await redis.set(cacheKey, JSON.stringify(results)); // ✅ FIXED
+        res.json(results);
+      }
+    );
+  } catch (error) {
+    return res.status(500).json({ error: "server error", details: error.message });
+  }
 });
-
-});
-
 
 module.exports = router;
