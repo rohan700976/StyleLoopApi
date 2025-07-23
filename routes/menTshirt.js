@@ -1,5 +1,6 @@
 const express=require('express')
 const router = express.Router();
+const redis = require('../client');
 
 
 // http://localhost:8000/menstshirt/tshirt
