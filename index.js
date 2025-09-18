@@ -17,10 +17,10 @@ app.use(cors());
 
 // MySQL connection config
 const db = mysql.createConnection({
-  host: process.env.HOST,
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE
+  host: 'localhost',
+  user: 'root',
+  password:'1432' ,
+  database: 'styleloop'
 });
 
 // Connect to DB
@@ -46,6 +46,9 @@ const filterRouter=require('./routes/filter')
 const kidsRouter=require('./routes/kids')
 const usersRouter=require('./routes/users')
 const wishlistRouter=require('./routes/wishlist')
+const cartRouter=require('./routes/cart')
+const auth = require('./routes/auth')
+
 app.use('/women',womensRoutes);
 app.use('/menshirt', menshirtRoutes);
 app.use('/menstshirt', menstshirtRoute);
@@ -54,6 +57,8 @@ app.use('/mensjeans',mensjeansRouter);
  app.use('/kids', kidsRouter);
  app.use('/api',usersRouter)
  app.use('/wishlist',wishlistRouter)
+ app.use('/cart',cartRouter);
+app.use('/auth', auth)
 
 
 // Start server

@@ -1,6 +1,18 @@
 const express = require('express');
 const router = express.Router();
 
+
+
+router.get('/getdata',(req,res)=>{
+    const db = req.app.get('db');
+    db.query('SELECT * FROM wishlist',(err,result)=>{
+        if(err){
+            return res.status(500).json({error:"query error",err});
+        }
+        res.status(200).json(result);
+    })
+})
+
 // GET wishlist by ID
 router.get('/get/:id', (req, res) => {
     const db = req.app.get('db');
