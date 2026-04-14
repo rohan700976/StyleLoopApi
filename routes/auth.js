@@ -2,7 +2,11 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+const nodemailer = require('nodemailer');
+const mail = nodemailer.createTransport({
+  service: "gmail",
+  auth: { user: "rohansingh707809@gmail.com", pass: "wfaz udeh zvod wpnw" }
+})
 const router = express.Router();
 
 // step2 create a secret key
@@ -13,26 +17,27 @@ router.post("/signup", async (req, res) => {
   const db = req.app.get("db");
   const {
     user_name,
-    user_mobile,
     user_email,
-    user_address,
     user_password,
-    isverifying,
+    user_mobile,
+    user_address,
     user_img,
+    isverifying,
+
   } = req.body;
 
   try {
     // 1. Check if user already exists
-    const checkQuery = "SELECT * FROM users WHERE user_email = ?";
-    db.query(checkQuery, [user_email], async (checkErr, existingUser) => {
-      if (checkErr) {
-        console.error("DB error:", checkErr);
-        return res.status(500).json({ error: "DB query error" });
-      }
+    // const checkQuery = "SELECT * FROM users WHERE user_email = ?";
+    // db.query(checkQuery, [user_email], async (checkErr, existingUser) => {
+    //   if (checkErr) {
+    //     console.error("DB error:", checkErr);
+    //     return res.status(500).json({ error: "DB query error" });
+    //   }
 
-      if (existingUser.length > 0) {
-        return res.status(400).json({ message: "Email already registered" });
-      }
+    //   if (existingUser.length > 0) {
+    //     return res.status(400).json({ message: "Email already registered" });
+    //   }
 
       // 2. Hash password
       const hashedPassword = await bcrypt.hash(user_password, 10);
@@ -73,7 +78,7 @@ router.post("/signup", async (req, res) => {
           });
         }
       );
-    });
+    // });
   } catch (err) {
     console.error("Signup error:", err);
     res.status(500).json({ error: "Something went wrong" });
@@ -140,8 +145,44 @@ function authMiddleware(req, res, next) {
 // ================== PROTECTED ROUTE ==================
 router.get("/profile", authMiddleware, (req, res) => {
   res.json({
-    message: `Hello ${req.user.email}, this is your profile`,
+    message: `Hello ${req.user.email}, this is your profile,`
   });
 });
+
+
+router.get('/send/:gmail/:otp', (req, res) => {
+  const otp = req.params.otp;
+  const gmail = req.params.gmail;
+  const mailBody = {
+    from: "rohansingh707809@gmail.com",
+    to: gmail,
+    subject: "welcome to styleLoop family",
+    text: `your account verification is:${otp}`
+  }
+  mail.sendMail(mailBody, (error, info) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).send("Error occured dusring send the mail"+error)
+    }
+
+    // console.info(info);
+    return res.status(200).send("Otp send successfully!!")
+  })
+
+})
+  router.get('/verify/:email/:isVerify', (req, res) => {
+    const db = req.app.get("db");
+    const isVarify = req.params.isVerify;
+    const email = req.params.email;
+    db.query(`Update users SET isverifying=? where user_email=?  `, [isVarify, email], (err, result) => {
+      if (err) {
+        console.error(err);
+      }
+      return res.status(200).json(result);
+    })
+
+    // res.status(200).send("gand mara")
+  })
+
 
 module.exports = router;
