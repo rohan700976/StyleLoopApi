@@ -17,11 +17,11 @@ app.use(cors());
 
 // MySQL connection config
 const db = mysql.createConnection({
-  host: 'trolley.proxy.rlwy.net',
-  user: 'root',
-  password:'TCNRjYQnqzPjiocyoMBNsUkUEqHAJmOc' ,
-  database: 'railway',
-    port: 40461
+  host: process.env.HOST,
+  user: process.env.USER,
+  password:process.env.PASSWORD ,
+  database: process.env.DATABASE,
+  port: process.env.PORT
 });
 
 // Connect to DB
