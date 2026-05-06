@@ -17,10 +17,11 @@ app.use(cors());
 
 // MySQL connection config
 const db = mysql.createConnection({
-  host: 'localhost',
+  host: 'trolley.proxy.rlwy.net',
   user: 'root',
-  password:'1432' ,
-  database: 'styleloop'
+  password:'TCNRjYQnqzPjiocyoMBNsUkUEqHAJmOc' ,
+  database: 'railway',
+    port: 40461
 });
 
 // Connect to DB
@@ -49,6 +50,7 @@ const wishlistRouter=require('./routes/wishlist')
 const cartRouter=require('./routes/cart')
 const auth = require('./routes/auth')
 
+
 app.use('/women',womensRoutes);
 app.use('/menshirt', menshirtRoutes);
 app.use('/menstshirt', menstshirtRoute);
@@ -58,7 +60,9 @@ app.use('/mensjeans',mensjeansRouter);
  app.use('/api',usersRouter)
  app.use('/wishlist',wishlistRouter)
  app.use('/cart',cartRouter);
-app.use('/auth', auth)
+app.use('/auth', auth);
+app.use('/api',usersRouter);
+
 
 
 // Start server
