@@ -17,6 +17,8 @@ app.use(cors());
 
 // MySQL connection config
 const db = mysql.createConnection({
+
+  
   host: process.env.HOST,
   user: process.env.USER,
   password:process.env.PASSWORD ,
@@ -57,11 +59,11 @@ app.use('/menstshirt', menstshirtRoute);
 app.use('/mensjeans',mensjeansRouter); 
  app.use('/filter',filterRouter);
  app.use('/kids', kidsRouter);
- app.use('/api',usersRouter)
  app.use('/wishlist',wishlistRouter)
  app.use('/cart',cartRouter);
 app.use('/auth', auth);
 app.use('/api',usersRouter);
+ app.use('/api',usersRouter)
 
 
 
